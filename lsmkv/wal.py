@@ -1,11 +1,3 @@
-"""Write-ahead log.
-
-Record layout (little endian):  crc32 | klen | vlen | key | value
-``vlen == 0xFFFFFFFF`` marks a tombstone (delete). The CRC covers everything
-after itself. On replay we stop at the first record that is truncated or fails
-its checksum (a torn write from a crash) and truncate the file there, so the
-log is always a clean prefix of what was acknowledged.
-"""
 import os
 import struct
 import zlib
