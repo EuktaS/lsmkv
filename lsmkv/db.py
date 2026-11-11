@@ -1,20 +1,3 @@
-"""A small LSM-tree key-value store.
-
-Write path : WAL append -> memtable -> (when big) flush to an immutable SSTable
-Read path  : memtable -> SSTables newest to oldest, skipping tables whose bloom
-             filter or key range rules the key out
-Compaction : merge a window of adjacent tables, drop shadowed versions, and drop
-             tombstones only when the window includes the oldest table
-Recovery   : manifest lists live tables; the WAL is replayed into the memtable.
-
-Crash-safety ordering on flush:
-  1. write SSTable to *.tmp, fsync, rename       (data durable, not yet referenced)
-  2. write MANIFEST.tmp, fsync, rename, fsync dir (table becomes live atomically)
-  3. truncate WAL
-A crash between 1 and 2 leaves an unreferenced file that is deleted on open and
-the WAL still has the data. A crash between 2 and 3 replays WAL entries that are
-already in the table; replay is idempotent because newer data shadows older.
-"""
 from __future__ import annotations
 
 import heapq
