@@ -1,21 +1,3 @@
-"""Immutable sorted string table.
-
-File layout
------------
-  [data blocks][index][bloom][footer]
-
-* data: records ``klen u32 | vlen u32 | key | value`` in key order. ``vlen`` of
-  0xFFFFFFFF is a tombstone. Records are grouped into blocks of
-  ``block_records`` entries.
-* index: sparse. One entry per block holding the block's first key and offset,
-  followed by the table's max key.
-* bloom: filter over every key in the table, tombstones included, so a
-  tombstone in a newer table correctly shadows an older value.
-* footer: fixed size, holds section offsets, record count and a magic number.
-
-A point lookup is: bloom check -> binary search the in-memory index -> one
-``pread`` of a single block -> linear scan inside that block.
-"""
 import os
 import struct
 from bisect import bisect_right
